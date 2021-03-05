@@ -15,14 +15,14 @@ const subcategoryRouter = require('./routes/subcategory');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 
-const port = process.env.PORT || 5003;
+const port = process.env.PORT || 5000;
 
 // Connect to database
 connectDB();
 // console.log('hello'.cyan, process.env.SECRET);
 
 //Middlewares
-app.use(express.static(__dirname + '/public'));
+// app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors());
@@ -37,6 +37,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.send('Hello World! Miss Valentine');
+  res.end();
 });
 //My Routes
 app.use('/api/auth', authRoutes);
@@ -47,5 +48,5 @@ app.use('/api/category', categoryRouter);
 app.use('/api/subcategory', subcategoryRouter);
 
 app.listen(port, () => {
-  console.log(` App listening at http://localhost:${port}`);
+  console.log(` App listening at ${port}`);
 });
