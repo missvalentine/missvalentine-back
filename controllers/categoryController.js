@@ -33,6 +33,7 @@ exports.getCategory = (req, res) => {
 exports.getAllCategory = (req, res) => {
   Category.find()
     .populate('subcategories')
+    .populate('products')
     .exec((err, categories) => {
       if (err) {
         return res.json({
