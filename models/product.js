@@ -6,7 +6,6 @@ const ProductSchema = new Schema({
   name: {
     type: String,
     trim: true,
-    required: true,
     maxlength: 32,
   },
   shortDesc: {
@@ -38,7 +37,6 @@ const ProductSchema = new Schema({
   ],
   price: {
     type: Number,
-    required: true,
     maxlength: 32,
     trim: true,
     default: 0,

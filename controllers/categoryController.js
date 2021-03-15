@@ -7,7 +7,7 @@ exports.getCategoryById = (req, res, next, id) => {
         Error: 'Category Not Found',
       });
     }
-    return (req.category = cate);
+    req.category = cate;
 
     next();
   });
@@ -60,6 +60,7 @@ exports.updateCategory = (req, res) => {
 };
 
 exports.deleteCategory = (req, res) => {
+  console.log('deleting');
   const category = req.category;
   category.remove((err, deletedCategory) => {
     if (err) {

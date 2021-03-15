@@ -47,7 +47,8 @@ var upload = multer({
     callback(null, true);
   },
   limits: {
-    fileSize: 420 * 150 * 200,
+    // fileSize: 420 * 150 * 200,
+    fileSize: '2MB',
   },
 });
 

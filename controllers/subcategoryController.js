@@ -1,6 +1,19 @@
 const SubCategory = require('../models/subcategory');
 const Category = require('../models/category');
 
+exports.getSubCategoryById = (req, res, next, id) => {
+  SubCategory.findById(id).exec((err, cate) => {
+    if (err) {
+      return res.json({
+        Error: 'SubCategory Not Found',
+      });
+    }
+    req.subcategory = cate;
+
+    next();
+  });
+};
+
 exports.getAllSubCategory = (req, res) => {
   SubCategory.find()
     .populate('category')
@@ -37,5 +50,21 @@ exports.createSubCategory = (req, res) => {
       });
     }
     return res.json({ data: cate, success: true });
+  });
+};
+
+exports.deleteSubCategory = (req, res) => {
+  const subcategory = req.subcategory;
+  subcategory.remove((err, deletedCategory) => {
+    if (err) {
+      return res.json({
+        error: 'Not able to Delete SubCategory',
+        success: false,
+      });
+    }
+    return res.json({
+      success: true,
+      messsage: 'SubCategory Deletion SuccessFull',
+    });
   });
 };

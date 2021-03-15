@@ -5,15 +5,17 @@ const fs = require('fs');
 const path = require('path');
 
 exports.getProductById = (req, res, next, id) => {
-  Product.findById(id).exec((err, product) => {
-    if (err || !product) {
-      return res.json({
-        Error: 'No Product Found in Inventory ',
-      });
-    }
-    req.product = product;
-    next();
-  });
+  Product.findById(id)
+    // .populate('category')
+    .exec((err, product) => {
+      if (err || !product) {
+        return res.json({
+          Error: 'No Product Found in Inventory ',
+        });
+      }
+      req.product = product;
+      next();
+    });
 };
 
 exports.getAllProduct = async (req, res, next) => {
@@ -45,32 +47,32 @@ exports.getAllProduct = async (req, res, next) => {
 
 exports.getOneProduct = async (req, res, next) => {
   try {
-    // return res.json({
-    //   error: 'Not able to fetch products',
-    //   success: false,
-    // });
-    let product = req.product;
-    if (product)
-      return res.status(200).json({
-        success: true,
-        data: product,
+    return await Product.findById(req.product._id)
+      .populate('category')
+      .populate('subCategories')
+      .exec((err, product) => {
+        if (err) {
+          return res.json({
+            error: 'Not able to fetch product',
+            success: false,
+          });
+        }
+        return res.status(200).json({
+          success: true,
+          data: product,
+        });
       });
-    return res.status(404).json({
-      success: false,
-      error: 'No product with this id',
-    });
   } catch (error) {
     return res.status(500).json({
       success: false,
       error: 'Server Error',
     });
   }
-  next();
 };
 
 exports.createProduct = async (req, res, next) => {
   const product = new Product();
-
+  console.log('prod', product);
   var filesArray = req.files;
 
   filesArray.map((item) => {
@@ -121,9 +123,10 @@ exports.createProduct = async (req, res, next) => {
 
   product.save((err, prd) => {
     if (err) {
+      console.log('err', err);
       return res.json({
         error: 'Not able to Add Product',
-        data: req.files,
+        data: product,
         success: false,
       });
     }
@@ -162,23 +165,3 @@ exports.deleteProduct = (req, res) => {
     });
   });
 };
-
-//filters for multer
-
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'uploads');
-//   },
-//   filename: (req, file, cb) => {
-//     console.log(file);
-//     cb(null, Date.now() + path.extname(file.originalname));
-//   },
-// });
-// const fileFilter = (req, file, cb) => {
-//   if (file.mimetype == 'image/jpeg' || file.mimetype == 'image/png') {
-//     cb(null, true);
-//   } else {
-//     cb(null, false);
-//   }
-// };
-// const upload = multer({ storage: storage, fileFilter: fileFilter });
