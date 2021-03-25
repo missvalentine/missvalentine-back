@@ -4,6 +4,8 @@ const Category = require('../models/category');
 const fs = require('fs');
 const path = require('path');
 
+const { uploadFile } = require('../awsSetup');
+
 exports.getProductById = (req, res, next, id) => {
   Product.findById(id)
     // .populate('category')
@@ -72,17 +74,23 @@ exports.getOneProduct = async (req, res, next) => {
 
 exports.createProduct = async (req, res, next) => {
   const product = new Product();
-  console.log('prod', product);
   var filesArray = req.files;
 
-  filesArray.map((item) => {
+  filesArray.map((item, index) => {
     if (item.fieldname == 'images') {
+      const fileName = `prd-${product._id}-${index}`;
+      const fileUrl = `https://missvalentine-images.s3.amazonaws.com/${fileName}`;
+
+      uploadFile(fileName, fs.readFileSync(item.path));
+
       product.images.push({
-        data: fs.readFileSync(item.path).toString('base64'),
+        data: fileUrl,
         contentType: item.mimetype,
       });
     }
   });
+
+  console.log('pushing others');
 
   // product.images = filesArray;
   product.name = req.body.name;
@@ -120,6 +128,7 @@ exports.createProduct = async (req, res, next) => {
   ).exec((err, cate) => {
     // console.log('', err, cate);
   });
+  console.log('saving prod');
 
   product.save((err, prd) => {
     if (err) {
@@ -133,6 +142,7 @@ exports.createProduct = async (req, res, next) => {
     return res.json({ data: prd, success: true });
   });
 };
+
 exports.updateProduct = (req, res) => {};
 // exports.deleteProduct = (req, res) => {
 //   let product = req.product;
@@ -160,7 +170,7 @@ exports.deleteProduct = (req, res) => {
     }
     // product.photo = undefined;
     res.json({
-      Msg: 'Product Removed Successfull',
+      Msg: 'Product Removed Successfully',
       productDetails: product,
     });
   });
