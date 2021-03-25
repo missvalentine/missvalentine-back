@@ -30,7 +30,7 @@ exports.getCategory = (req, res) => {
   try {
     return Category.findById(req.category._id)
       .populate('products')
-      .populate('subCategories')
+      .populate('subcategories')
       .exec((err, cate) => {
         if (err) {
           return res.json({
@@ -51,10 +51,13 @@ exports.getCategory = (req, res) => {
   }
 };
 
+// {path: 'spells', options: { sort: [['damages', 'asc']] }}
+// .populate('products')
+
 exports.getAllCategory = (req, res) => {
   Category.find()
     .populate('subcategories')
-    .populate('products')
+    .populate({ path: 'products', options: { sort: { createdAt: -1 } } })
     .exec((err, categories) => {
       if (err) {
         return res.json({

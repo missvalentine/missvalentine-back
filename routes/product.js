@@ -57,7 +57,7 @@ router.get('/all', getAllProduct);
 router.param('productId', getProductById);
 router.param('userId', getUserById);
 
-router.get('/:productId', getOneProduct);
+router.get('/:productId', getOneProduct); 
 
 router.post(
   '/create/:userId',

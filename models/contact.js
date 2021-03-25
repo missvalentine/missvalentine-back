@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const contactSchema = new Schema({
+  name: {
+    type: String,
+    trim: true,
+    maxlength: 32,
+  },
   email: {
     type: String,
     trim: true,
@@ -17,10 +22,15 @@ const contactSchema = new Schema({
     trim: true,
     maxlength: 32,
   },
-  type: {
+  subject: {
     type: String,
     trim: true,
     maxlength: 32,
+  },
+  text: {
+    type: String,
+    trim: true,
+    maxlength: 500,
   },
   createdAt: { type: Date, default: Date.now },
 });

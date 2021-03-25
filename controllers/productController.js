@@ -23,9 +23,9 @@ exports.getProductById = (req, res, next, id) => {
 exports.getAllProduct = async (req, res, next) => {
   try {
     return await Product.find()
+      .sort({ createdAt: -1 })
       .populate('subCategories')
       .populate('category')
-      .sort({ date: -1 })
       .limit(req.body.limit ? req.body.limit : 30)
       .exec((err, products) => {
         if (err) {
