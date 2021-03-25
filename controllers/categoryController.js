@@ -28,21 +28,23 @@ exports.createCategory = (req, res) => {
 
 exports.getCategory = (req, res) => {
   try {
-    return await Category.findById(req.category._id)
-      .populate('products')
-      .populate('subCategories')
-      .exec((err, cate) => {
-        if (err) {
-          return res.json({
-            error: 'Not able to fetch product',
-            success: false,
+    return (
+      Category.findById(req.category._id)
+        // .populate('products')
+        // .populate('subCategories')
+        .exec((err, cate) => {
+          if (err) {
+            return res.json({
+              error: 'Not able to fetch product',
+              success: false,
+            });
+          }
+          return res.status(200).json({
+            success: true,
+            data: cate,
           });
-        }
-        return res.status(200).json({
-          success: true,
-          data: cate,
-        });
-      });
+        })
+    );
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -50,7 +52,7 @@ exports.getCategory = (req, res) => {
     });
   }
 };
- 
+
 exports.getAllCategory = (req, res) => {
   Category.find()
     .populate('subcategories')

@@ -1,26 +1,19 @@
 const express = require('express');
 const router = express.Router();
 
-const Contact = require('../models/contact');
+const {
+  isAdmin,
+  isAuthenticate,
+  isSignIn,
+} = require('../controllers/authController');
 
-router.get('/', (req, res) => {
-  console.log('working');
-  Contact.find()
-    .then((data) =>
-      res.status(200).json({ data, message: 'Contact fetched Successfully' })
-    )
-    .catch((err) => res.status(404).json({ message: err.message }));
-});
+const {
+  createContact,
+  getAllContact,
+} = require('../controllers/contactController');
 
-router.post('/', (req, res) => {
-  console.log(req.body);
-  let address = new Contact(req.body);
-  address
-    .save()
-    .then((data) =>
-      res.status(200).json({ message: 'Addresses Added Successfully' })
-    )
-    .catch((err) => res.status(404).json({ message: err.message }));
-});
+router.get('/all', isSignIn, isAuthenticate, isAdmin, getAllContact);
+
+router.post('/', createContact);
 
 module.exports = router;

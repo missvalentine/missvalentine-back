@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const { ObjectId } = mongoose.Schema;
 
 const contactSchema = new Schema({
   email: {
@@ -14,6 +13,11 @@ const contactSchema = new Schema({
     trim: true,
   },
   callScreen: {
+    type: String,
+    trim: true,
+    maxlength: 32,
+  },
+  type: {
     type: String,
     trim: true,
     maxlength: 32,

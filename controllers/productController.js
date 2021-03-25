@@ -90,8 +90,6 @@ exports.createProduct = async (req, res, next) => {
     }
   });
 
-  console.log('pushing others');
-
   // product.images = filesArray;
   product.name = req.body.name;
   product.shortDesc = req.body.shortDesc;
