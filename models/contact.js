@@ -7,7 +7,7 @@ const contactSchema = new Schema({
     trim: true,
     maxlength: 32,
   },
-  email: {
+  storeName: {
     type: String,
     trim: true,
     maxlength: 32,
@@ -17,7 +17,27 @@ const contactSchema = new Schema({
     maxlength: 10,
     trim: true,
   },
+  email: {
+    type: String,
+    trim: true,
+    maxlength: 32,
+  },
+  address: {
+    type: String,
+    trim: true,
+    maxlength: 100,
+  },
   callScreen: {
+    type: String,
+    trim: true,
+    maxlength: 32,
+  },
+  city: {
+    type: String,
+    trim: true,
+    maxlength: 32,
+  },
+  state: {
     type: String,
     trim: true,
     maxlength: 32,
@@ -32,6 +52,12 @@ const contactSchema = new Schema({
     trim: true,
     maxlength: 500,
   },
+  products: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Product',
+    },
+  ],
   createdAt: { type: Date, default: Date.now },
 });
 

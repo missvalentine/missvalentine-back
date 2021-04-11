@@ -13,7 +13,30 @@ exports.getSubCategoryById = (req, res, next, id) => {
     next();
   });
 };
-
+exports.getOneSubcategoryId = async (req, res, next) => {
+  try {
+    console.log(req);
+    return await SubCategory.findById(req.subcategory._id)
+      .populate('products')
+      .exec((err, sCate) => {
+        if (err) {
+          return res.json({
+            error: 'Not able to fetch subcategory',
+            success: false,
+          });
+        }
+        return res.status(200).json({
+          success: true,
+          data: sCate,
+        });
+      });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error',
+    });
+  }
+};
 exports.getAllSubCategory = (req, res) => {
   SubCategory.find()
     .populate('category')

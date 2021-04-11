@@ -13,6 +13,7 @@ const {
   // updateCategory,
   getSubCategoryById,
   deleteSubCategory,
+  getOneSubcategoryId,
 } = require('../controllers/subcategoryController');
 const { getUserById } = require('../controllers/userController');
 
@@ -28,6 +29,8 @@ router.post(
   createSubCategory
 );
 
+router.get('/:subcategoryId', getOneSubcategoryId);
+
 router.get('/all', getAllSubCategory);
 
 router.delete(
@@ -36,9 +39,6 @@ router.delete(
   isAuthenticate,
   isAdmin,
   deleteSubCategory
-  // (req, res) => {
-  //   console.log('pls del');
-  // }
 );
 
 module.exports = router;

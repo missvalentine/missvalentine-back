@@ -26,7 +26,7 @@ exports.getAllProduct = async (req, res, next) => {
       .sort({ createdAt: -1 })
       .populate('subCategories')
       .populate('category')
-      .limit(req.body.limit ? req.body.limit : 30)
+      .limit(req.body.limit ? req.body.limit : 33)
       .exec((err, products) => {
         if (err) {
           return res.json({
