@@ -4,7 +4,7 @@ const Category = require('../models/category');
 const fs = require('fs');
 const path = require('path');
 
-const { uploadFile } = require('../awsSetup');
+const { uploadFile, deleteFile } = require('../awsSetup');
 
 exports.getProductById = (req, res, next, id) => {
   Product.findById(id)
@@ -134,12 +134,16 @@ exports.createProduct = async (req, res, next) => {
     if (err) {
       console.log('err', err);
       return res.json({
-        error: 'Not able to Add Product',
+        message: 'Not able to Add Product',
         data: product,
         success: false,
       });
     }
-    return res.json({ data: prd, success: true });
+    return res.json({
+      data: prd,
+      success: true,
+      message: 'Product Added Successfully',
+    });
   });
 };
 
@@ -161,17 +165,25 @@ exports.updateProduct = (req, res) => {};
 // };
 exports.deleteProduct = (req, res) => {
   let product = req.product;
+  for (let i = 0; i < product.images.length; i++) {
+    const fileName = `prd-${product._id}-${i}`;
+    console.log('fileName', fileName);
+    deleteFile(fileName);
+  }
+
   product.remove((err, product) => {
     if (err) {
-      return res.json({
+      return res.status(400).json({
         err,
-        Error: 'Product is not removed from DB',
+        Error: 'Product deletion Failed',
+        success: false,
       });
     }
     // product.photo = undefined;
-    res.json({
-      Msg: 'Product Removed Successfully',
+    res.status(200).json({
+      message: 'Product Removed Successfully',
       productDetails: product,
+      success: true,
     });
   });
 };

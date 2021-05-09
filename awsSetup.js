@@ -13,23 +13,7 @@ const s3 = new AWS.S3({
   secretAccessKey: AWS_SECRET_ACCESS_KEY,
 });
 
-// const params = {
-//   Bucket: BUCKET_NAME,
-//   CreateBucketConfiguration: {
-//     // Set your region here
-//     LocationConstraint: REGION_NAME,
-//   },
-// };
-
-// s3.createBucket(params, function (err, data) {
-//   if (err) console.log(err, err.stack);
-//   else console.log('Bucket Created Successfully', data.Location);
-// });
-
 module.exports.uploadFile = function (fileName, file) {
-  // Read content from the file
-  //   const fileContent = fs.readFileSync(fileName);
-
   // Setting up S3 upload parameters
   const params = {
     Bucket: BUCKET_NAME,
@@ -45,5 +29,18 @@ module.exports.uploadFile = function (fileName, file) {
     }
     console.log(`File uploaded successfully. ${data.Location}`);
     return data.Location;
+  });
+};
+module.exports.deleteFile = function (fileName) {
+  const params = {
+    Bucket: BUCKET_NAME,
+    Key: fileName,
+  };
+  s3.deleteObject(params, function (err, data) {
+    if (data) {
+      console.log('File deleted successfully');
+    } else {
+      console.log('Check if you have sufficient permissions : ' + err);
+    }
   });
 };
