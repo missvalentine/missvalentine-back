@@ -15,15 +15,26 @@ exports.getCategoryById = (req, res, next, id) => {
 
 exports.createCategory = (req, res) => {
   const category = new Category(req.body);
-  category.save((err, cate) => {
-    if (err) {
+  try {
+    category.save((err, cate) => {
+      if (err) {
+        return res.json({
+          error: 'Not able to Add Category',
+          success: false,
+        });
+      }
       return res.json({
-        error: 'Not able to Add Category',
-        success: false,
+        message: 'Category created Successfully',
+        success: true,
+        data: cate,
       });
-    }
-    return res.json({ data: cate, success: true });
-  });
+    });
+  } catch {
+    return res.status(500).json({
+      message: 'Something went wrong',
+      success: false,
+    });
+  }
 };
 
 exports.getCategory = (req, res) => {
@@ -73,25 +84,47 @@ exports.updateCategory = (req, res) => {
   const category = req.category;
   category.name = req.body.name;
 
-  category.save((err, updatedCategory) => {
-    if (err) {
+  try {
+    category.save((err, updatedCategory) => {
+      if (err) {
+        return res.json({
+          message: 'Category Modification failed',
+          success: false,
+        });
+      }
       return res.json({
-        Error: 'Not able to Update Category',
+        message: 'Category Updated Successfully',
+        success: true,
+        data: updatedCategory,
       });
-    }
-    return res.json({ updatedCategory });
-  });
+    });
+  } catch {
+    return res.status(500).json({
+      message: 'Something went wrong',
+      success: false,
+    });
+  }
 };
 
 exports.deleteCategory = (req, res) => {
-  console.log('deleting');
   const category = req.category;
-  category.remove((err, deletedCategory) => {
-    if (err) {
+  try {
+    category.remove((err, deletedCategory) => {
+      if (err) {
+        return res.json({
+          message: 'Category Deletion failed',
+          success: false,
+        });
+      }
       return res.json({
-        Error: 'Not able to Delete Category',
+        message: 'Category Deletion SuccessFull',
+        success: true,
       });
-    }
-    return res.json({ msg: 'Category Deletion SuccessFull' });
-  });
+    });
+  } catch {
+    return res.status(500).json({
+      message: 'Something went wrong',
+      success: false,
+    });
+  }
 };

@@ -3,13 +3,13 @@ const Category = require('../models/category');
 
 exports.getSubCategoryById = (req, res, next, id) => {
   SubCategory.findById(id).exec((err, cate) => {
-    if (err) {
+    if (err || !cate) {
       return res.json({
-        Error: 'SubCategory Not Found',
+        message: 'No SubCategory Found ',
+        success: false,
       });
     }
     req.subcategory = cate;
-
     next();
   });
 };
@@ -53,41 +53,107 @@ exports.getAllSubCategory = (req, res) => {
 
 exports.createSubCategory = (req, res) => {
   const subcategory = new SubCategory(req.body);
+  try {
+    Category.updateOne(
+      { _id: req.body.category },
+      {
+        $push: {
+          subcategories: subcategory._id,
+        },
+      }
+    ).exec((err, cate) => {
+      console.log('hello', err, cate);
+    });
 
-  Category.updateOne(
-    { _id: req.body.category },
-    {
-      $push: {
-        subcategories: subcategory._id,
-      },
-    }
-  ).exec((err, cate) => {
-    console.log('hello', err, cate);
-  });
-
-  subcategory.save((err, cate) => {
-    if (err) {
+    subcategory.save((err, cate) => {
+      if (err) {
+        return res.json({
+          message: 'Not able to Add SubCategory',
+          success: false,
+        });
+      }
       return res.json({
-        error: 'Not able to Add Category',
-        success: false,
+        data: cate,
+        success: true,
+        message: 'SubCategory Added Successfully',
       });
-    }
-    return res.json({ data: cate, success: true });
-  });
+    });
+  } catch {
+    return res.status(500).json({
+      message: 'Something went wrong',
+      success: false,
+    });
+  }
 };
 
 exports.deleteSubCategory = (req, res) => {
   const subcategory = req.subcategory;
-  subcategory.remove((err, deletedCategory) => {
-    if (err) {
+  try {
+    subcategory.remove((err, deletedCategory) => {
+      if (err) {
+        return res.json({
+          message: 'Not able to Delete SubCategory',
+          success: false,
+        });
+      }
       return res.json({
-        error: 'Not able to Delete SubCategory',
-        success: false,
+        success: true,
+        message: 'SubCategory Deletion SuccessFull',
       });
-    }
-    return res.json({
-      success: true,
-      messsage: 'SubCategory Deletion SuccessFull',
     });
-  });
+  } catch {
+    return res.status(500).json({
+      message: 'Something went wrong',
+      success: false,
+    });
+  }
+};
+
+exports.updateSubCategory = (req, res) => {
+  const subcategory = req.subcategory;
+  subcategory.name = req.body.name;
+  if (req.body.category !== subcategory.category) {
+    Category.updateOne(
+      { _id: req.body.category },
+      {
+        $push: {
+          subcategories: subcategory._id,
+        },
+      }
+    ).exec((err, cate) => {
+      console.log('adding sc to new c', err, cate);
+    });
+    Category.updateOne(
+      { _id: subcategory.category },
+      {
+        $pull: {
+          subcategories: subcategory._id,
+        },
+      }
+    ).exec((err, cate) => {
+      console.log('removing sc from prev c', err, cate);
+    });
+    subcategory.category = req.body.category;
+  }
+
+  try {
+    subcategory.save((err, updatedSubCategory) => {
+      if (err) {
+        return res.json({
+          message: 'Category Modification failed',
+          success: false,
+        });
+      }
+      return res.json({
+        message: 'Category Updated Successfully',
+        success: true,
+        data: updatedSubCategory,
+      });
+    });
+  } catch {
+    return res.status(500).json({
+      message: 'Something went wrong',
+      success: false,
+    });
+  }
 };

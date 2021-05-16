@@ -10,7 +10,7 @@ const {
 const {
   createSubCategory,
   getAllSubCategory,
-  // updateCategory,
+  updateSubCategory,
   getSubCategoryById,
   deleteSubCategory,
   getOneSubcategoryId,
@@ -29,9 +29,17 @@ router.post(
   createSubCategory
 );
 
+router.get('/all', getAllSubCategory);
+
 router.get('/:subcategoryId', getOneSubcategoryId);
 
-router.get('/all', getAllSubCategory);
+router.put(
+  '/:subcategoryId/:userId',
+  isSignIn,
+  isAuthenticate,
+  isAdmin,
+  updateSubCategory
+);
 
 router.delete(
   '/:subcategoryId/:userId',

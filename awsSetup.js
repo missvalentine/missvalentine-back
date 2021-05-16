@@ -31,6 +31,7 @@ module.exports.uploadFile = function (fileName, file) {
     return data.Location;
   });
 };
+
 module.exports.deleteFile = function (fileName) {
   const params = {
     Bucket: BUCKET_NAME,
@@ -39,6 +40,24 @@ module.exports.deleteFile = function (fileName) {
   s3.deleteObject(params, function (err, data) {
     if (data) {
       console.log('File deleted successfully');
+    } else {
+      console.log('Check if you have sufficient permissions : ' + err);
+    }
+  });
+};
+
+module.exports.renameFile = function (oldFileName, newFileName) {
+  const params = {
+    Bucket: BUCKET_NAME,
+    CopySource: `${BUCKET_NAME}/${oldFileName}`,
+    Key: newFileName,
+  };
+  s3.copyObject(params, function (err, data) {
+    if (data) {
+      s3.deleteObject({
+        Bucket: BUCKET_NAME,
+        Key: oldFileName,
+      });
     } else {
       console.log('Check if you have sufficient permissions : ' + err);
     }

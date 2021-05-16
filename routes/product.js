@@ -12,7 +12,7 @@ const {
 const {
   getAllProduct,
   createProduct,
-  updateProduct,
+  // updateProduct,
   deleteProduct,
   getProductById,
   getOneProduct,
@@ -57,7 +57,7 @@ router.get('/all', getAllProduct);
 router.param('productId', getProductById);
 router.param('userId', getUserById);
 
-router.get('/:productId', getOneProduct); 
+router.get('/:productId', getOneProduct);
 
 router.post(
   '/create/:userId',
@@ -69,13 +69,13 @@ router.post(
   createProduct
 );
 
-router.put(
-  '/:productId/:userId',
-  isSignIn,
-  isAuthenticate,
-  isAdmin,
-  updateProduct
-);
+// router.put(
+//   '/:productId/:userId',
+//   isSignIn,
+//   isAuthenticate,
+//   isAdmin,
+//   updateProduct
+// );
 
 router.delete(
   '/:productId/:userId',

@@ -4,7 +4,7 @@ const Category = require('../models/category');
 const fs = require('fs');
 const path = require('path');
 
-const { uploadFile, deleteFile } = require('../awsSetup');
+const { uploadFile, deleteFile, renameFile } = require('../awsSetup');
 
 exports.getProductById = (req, res, next, id) => {
   Product.findById(id)
@@ -75,94 +75,110 @@ exports.getOneProduct = async (req, res, next) => {
 };
 
 exports.createProduct = async (req, res, next) => {
-  const product = new Product();
-  var filesArray = req.files;
+  try {
+    const product = new Product();
+    var filesArray = req.files;
 
-  filesArray.map((item, index) => {
-    if (item.fieldname == 'images') {
-      const fileName = `prd-${product._id}-${index}`;
-      const fileUrl = `https://missvalentine-images.s3.amazonaws.com/${fileName}`;
+    let addIndex = 0;
 
-      uploadFile(fileName, fs.readFileSync(item.path));
+    if (req.body.isEdit && req.body.oldImages) {
+      if (typeof req.body.oldImages === 'string') {
+        req.body.oldImages = [req.body.oldImages];
+      }
+      addIndex = req.body.oldImages.length;
 
-      product.images.push({
-        data: fileUrl,
-        contentType: item.mimetype,
+      req.body.oldImages.map((item, index) => {
+        const { data, contentType } = JSON.parse(item);
+        const oldFileName = data.slice(data.indexOf('prd'));
+        const newFileName = `prd-${product._id}-${index}`;
+        const newFileUrl = `https://missvalentine-images.s3.amazonaws.com/${newFileName}`;
+
+        renameFile(oldFileName, newFileName);
+
+        product.images.push({
+          data: newFileUrl,
+          contentType,
+        });
       });
     }
-  });
+    // renameFile
+    filesArray.map((item, index) => {
+      if (item.fieldname == 'images') {
+        const fileName = `prd-${product._id}-${index + addIndex}`;
+        const fileUrl = `https://missvalentine-images.s3.amazonaws.com/${fileName}`;
 
-  // product.images = filesArray;
-  product.name = req.body.name;
-  product.shortDesc = req.body.shortDesc;
-  product.description = req.body.description;
-  product.category = req.body.category;
-  product.price = req.body.price;
-  product.hidden = req.body.hidden;
-  product.sizes = JSON.parse(req.body.sizes);
-  product.colors = JSON.parse(req.body.colors);
-  product.subCategories = JSON.parse(req.body.subCategories);
+        uploadFile(fileName, fs.readFileSync(item.path));
 
-  Category.updateOne(
-    { _id: product.category },
-    {
-      $push: {
-        products: product._id,
-      },
-    }
-  ).exec((err, cate) => {
-    // console.log('', err, cate);
-  });
-
-  SubCategory.updateMany(
-    {
-      _id: {
-        $in: product.subCategories,
-      },
-    },
-    {
-      $push: {
-        products: product._id,
-      },
-    }
-  ).exec((err, cate) => {
-    // console.log('', err, cate);
-  });
-  console.log('saving prod');
-
-  product.save((err, prd) => {
-    if (err) {
-      console.log('err', err);
-      return res.json({
-        message: 'Not able to Add Product',
-        data: product,
-        success: false,
-      });
-    }
-    return res.json({
-      data: prd,
-      success: true,
-      message: 'Product Added Successfully',
+        product.images.push({
+          data: fileUrl,
+          contentType: item.mimetype,
+        });
+      }
     });
-  });
+
+    // product.images = filesArray;
+    product.name = req.body.name;
+    product.shortDesc = req.body.shortDesc;
+    product.description = req.body.description;
+    product.category = req.body.category;
+    product.price = req.body.price;
+    product.hidden = req.body.hidden;
+    product.sizes = JSON.parse(req.body.sizes);
+    product.colors = JSON.parse(req.body.colors);
+    product.subCategories = JSON.parse(req.body.subCategories);
+
+    Category.updateOne(
+      { _id: product.category },
+      {
+        $push: {
+          products: product._id,
+        },
+      }
+    ).exec((err, cate) => {
+      // console.log('', err, cate);
+    });
+
+    SubCategory.updateMany(
+      {
+        _id: {
+          $in: product.subCategories,
+        },
+      },
+      {
+        $push: {
+          products: product._id,
+        },
+      }
+    ).exec((err, cate) => {
+      // console.log('', err, cate);
+    });
+    console.log('saving prod');
+
+    product.save((err, prd) => {
+      if (err) {
+        return res.json({
+          message: 'Not able to Add Product',
+          data: product,
+          success: false,
+          err,
+        });
+      }
+
+      return res.json({
+        data: prd,
+        success: true,
+        message: 'Product Added Successfully',
+      });
+    });
+  } catch (error) {
+    console.log('err', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error',
+    });
+  }
 };
 
-exports.updateProduct = (req, res) => {};
-// exports.deleteProduct = (req, res) => {
-//   let product = req.product;
-//   product.remove.exec((err, products) => {
-//     if (err) {
-//       return res.json({
-//         error: ' not Deleted',
-//         success: false,
-//       });
-//     }
-//     return res.status(200).json({
-//       success: true,
-//       message: 'Deleted Successfully',
-//     });
-//   });
-// };
 exports.deleteProduct = (req, res) => {
   let product = req.product;
   for (let i = 0; i < product.images.length; i++) {

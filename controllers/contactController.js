@@ -24,21 +24,23 @@ exports.getAllContact = (req, res, next) => {
 };
 exports.getEnquiry = (req, res, next) => {
   try {
-    return Contact.find({ callScreen: 'enquiry' }).exec((err, cont) => {
-      console.log('getEnquiry', cont);
+    return Contact.find({ callScreen: 'enquiry' })
+      .populate('products')
+      .exec((err, cont) => {
+        console.log('getEnquiry', cont);
 
-      if (err) {
-        return res.json({
-          error: 'Not able to fetch contacts',
-          success: false,
+        if (err) {
+          return res.json({
+            error: 'Not able to fetch contacts',
+            success: false,
+          });
+        }
+        return res.status(200).json({
+          success: true,
+          count: cont.length,
+          data: cont,
         });
-      }
-      return res.status(200).json({
-        success: true,
-        count: cont.length,
-        data: cont,
       });
-    });
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -106,29 +108,30 @@ exports.createContact = (req, res) => {
 };
 
 exports.getContactById = (req, res, next, id) => {
-  Contact.findById(id).exec((err, cate) => {
+  Contact.findById(id).exec((err, contact) => {
     if (err) {
       return res.json({
         Error: 'contact Not Found',
       });
     }
-    req.category = cate;
+
+    req.contact = contact;
 
     next();
   });
 };
 
 exports.deleteContact = (req, res) => {
-  const contact = req.Contact;
+  const contact = req.contact;
   contact.remove((err, deletedContact) => {
     if (err) {
       return res.json({
-        msg: 'Not able to Delete Contact',
+        message: 'Not able to Delete Contact',
         success: true,
       });
     }
     return res.json({
-      msg: 'Contact Deletion SuccessFull',
+      message: 'Contact Deletion SuccessFull',
       success: true,
       data: deletedContact,
     });

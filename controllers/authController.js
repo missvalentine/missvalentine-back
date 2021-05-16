@@ -43,13 +43,15 @@ exports.signin = (req, res) => {
   User.findOne({ email }, (err, user) => {
     if (err || !user) {
       return res.status(400).json({
-        error: 'USER email does not exists',
+        message: 'USER email does not exists',
+        success: false,
       });
     }
 
     if (!user.authenticate(password)) {
       return res.status(401).json({
-        error: 'Email and password do not match',
+        message: 'Email and password do not match',
+        success: false,
       });
     }
 
@@ -63,7 +65,12 @@ exports.signin = (req, res) => {
 
     //send response to front end
     const { _id, name, email, role } = user;
-    return res.json({ token, user: { _id, name, email, role } });
+    return res.json({
+      token,
+      user: { _id, name, email, role },
+      success: true,
+      message: 'Sign In successfully',
+    });
   });
 };
 
