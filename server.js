@@ -37,7 +37,8 @@ app.get('/', (req, res) => {
   res.send('Hello World! Miss Valentine')
   res.end()
 })
-//My Routes
+
+//Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/contact', contactRouter)
