@@ -16,6 +16,7 @@ const {
   deleteProduct,
   getProductById,
   getOneProduct,
+  getProductBySlug,
 } = require('../controllers/productController');
 const { getUserById } = require('../controllers/userController');
 
@@ -57,6 +58,7 @@ router.get('/all', getAllProduct);
 router.param('productId', getProductById);
 router.param('userId', getUserById);
 
+router.get('/slug', getProductBySlug);
 router.get('/:productId', getOneProduct);
 
 router.post(

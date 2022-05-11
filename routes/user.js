@@ -1,22 +1,23 @@
-const express = require('express');
+const express = require('express')
 
-const router = express.Router();
+const router = express.Router()
 
-// const {
-//   getUserById,
-//   getUser,
-//   updateUser,
-//   userPurchaseList,
-// } = require('../controllers/userController');
-// const {
-//   isAdmin,
-//   isSignIn,
-//   isAuthenticate,
-// } = require('../controllers/authController');
+const {
+  getUserById,
+  getUser,
+  updateUser,
+  userPurchaseList,
+} = require('../controllers/userController')
 
-// router.param('userId', getUserById);
+const {
+  isAdmin,
+  isSignIn,
+  isAuthenticate,
+} = require('../controllers/authController')
 
-// router.get('/user/:userId', isSignIn, isAuthenticate, getUser);
-// router.put('/user/:userId', isSignIn, isAuthenticate, updateUser);
+router.param('userId', getUserById)
 
-module.exports = router;
+router.get('/user/:userId', isSignIn, isAuthenticate, getUser)
+router.put('/user/:userId', isSignIn, isAuthenticate, updateUser)
+
+module.exports = router

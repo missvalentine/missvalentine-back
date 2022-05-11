@@ -1,6 +1,7 @@
-var mongoose = require('mongoose');
+var mongoose = require('mongoose')
+const { ObjectId } = mongoose.Schema
 
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs')
 
 var userSchema = new mongoose.Schema(
   {
@@ -21,9 +22,20 @@ var userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    phoneNo: {
+      type: Number,
+      trim: true,
+      required: true,
+      unique: true,
+      maxlength: 10,
+    },
     userinfo: {
       type: String,
       trim: true,
+    },
+    authSource: {
+      type: String,
+      default: 'own',
     },
     encry_password: {
       type: String,
@@ -34,38 +46,46 @@ var userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    purchases: {
+    wishlist: {
+      ref: 'Wishlist',
+      type: ObjectId,
+    },
+    cart: {
+      ref: 'Cart',
+      type: ObjectId,
+    },
+    orders: {
       type: Array,
       default: [],
     },
   },
-  { timestamps: true }
-);
+  { timestamps: true },
+)
 
 userSchema
   .virtual('password')
   .set(function (password) {
-    this._password = password;
+    this._password = password
 
-    this.encry_password = this.securePassword(password);
+    this.encry_password = this.securePassword(password)
   })
   .get(function () {
-    return this._password;
-  });
+    return this._password
+  })
 
 userSchema.methods = {
   authenticate: function (plainpassword) {
-    return bcrypt.compareSync(plainpassword, this.encry_password);
+    return bcrypt.compareSync(plainpassword, this.encry_password)
   },
 
   securePassword: function (plainpassword) {
-    if (!plainpassword) return 'error';
+    if (!plainpassword) return 'error'
     try {
-      return bcrypt.hashSync(plainpassword, 10);
+      return bcrypt.hashSync(plainpassword, 10)
     } catch (err) {
-      return err;
+      return err
     }
   },
-};
+}
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', userSchema)

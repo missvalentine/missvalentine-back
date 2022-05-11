@@ -26,7 +26,10 @@ connectDB();
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(morgan('combined'));
 
 // const publicPath = path.join(__dirname, '..', 'public');
 // app.use(express.static(publicPath));

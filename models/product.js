@@ -7,6 +7,20 @@ const ProductSchema = new Schema({
     type: String,
     trim: true,
     maxlength: 32,
+    required: true,
+  },
+  slug:{
+    type: String,
+    trim: true,
+    maxlength: 32,
+    unique: true,
+    required: true,
+    // fix for missing usernames causing validation fail
+    default: function() {
+        return this.name.toLowerCase()
+        .replace(/[^\w ]+/g, '')
+        .replace(/ +/g, '-');
+    }
   },
   shortDesc: {
     type: String,
@@ -38,6 +52,17 @@ const ProductSchema = new Schema({
   price: {
     type: Number,
     maxlength: 32,
+    trim: true,
+    default: 0,
+  },
+  inStock:{
+    type: Number,
+    maxlength: 32,
+    trim: true,
+    default: 10,
+  },
+  discount: {
+    type: Number,
     trim: true,
     default: 0,
   },

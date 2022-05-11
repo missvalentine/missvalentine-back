@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 const contactSchema = new Schema({
   name: {
@@ -42,6 +42,11 @@ const contactSchema = new Schema({
     trim: true,
     maxlength: 32,
   },
+  queryType: {
+    type: String,
+    trim: true,
+    maxlength: 32,
+  },
   subject: {
     type: String,
     trim: true,
@@ -59,6 +64,6 @@ const contactSchema = new Schema({
     },
   ],
   createdAt: { type: Date, default: Date.now },
-});
+})
 
-module.exports = mongoose.model('Contact', contactSchema);
+module.exports = mongoose.model('Contact', contactSchema)

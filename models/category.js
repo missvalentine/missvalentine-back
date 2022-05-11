@@ -9,7 +9,18 @@ const CategorySchema = new Schema({
     required: true,
     maxlength: 32,
   },
-
+  slug:{
+    type: String,
+    trim: true,
+    maxlength: 32,
+    unique: true,
+    required: true,
+    default: function() {
+        return this.name.toLowerCase()
+        .replace(/[^\w ]+/g, '')
+        .replace(/ +/g, '-');
+    }
+  },
   products: [
     {
       type: ObjectId,

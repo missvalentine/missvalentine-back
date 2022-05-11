@@ -1,40 +1,43 @@
-const express = require('express');
+const express = require('express')
 
-const router = express.Router();
+const router = express.Router()
 
-const { check, validationResult } = require('express-validator');
+const { check, validationResult } = require('express-validator')
 const {
   signout,
-  signup,
-  signin,
+  register,
+  login,
   isSignIn,
-} = require('../controllers/authController');
+} = require('../controllers/authController')
 
 router.post(
-  '/signup',
+  '/register',
   [
-    check('name', 'name should be at least 3 char').isLength({ min: 3 }),
-    check('email', 'email is required').isEmail(),
-    check('password', 'password should be at least 3 char').isLength({
-      min: 3,
+    check('name', 'Name should be at least 3 characters').isLength({ min: 3 }),
+    check('email', 'Email is required').isEmail(),
+    check('phoneNo', 'Phone Number is not valid')
+      .isNumeric()
+      .isLength({ min: 10, max: 10 }),
+    check('password', 'Password should be at least 8 characters').isLength({
+      min: 8,
     }),
   ],
-  signup
-);
+  register,
+)
 
 router.post(
-  '/signin',
+  '/login',
   [
     check('email', 'email is required').isEmail(),
     check('password', 'password field is required').isLength({ min: 1 }),
   ],
-  signin
-);
+  login,
+)
 
-router.get('/signout', signout);
+router.get('/signout', signout)
 
 router.get('/testroute', isSignIn, (req, res) => {
-  res.send('A protected route');
-});
+  res.send('A protected route')
+})
 
-module.exports = router;
+module.exports = router

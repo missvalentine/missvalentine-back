@@ -14,6 +14,7 @@ const {
   getAllCategory,
   updateCategory,
   deleteCategory,
+  getCategoryBySlug,
 } = require('../controllers/categoryController');
 const { getUserById } = require('../controllers/userController');
 
@@ -29,6 +30,8 @@ router.post(
   createCategory
 );
 router.get('/all', getAllCategory);
+
+router.get('/slug', getCategoryBySlug);
 
 router.get('/:categoryId', getCategory);
 
