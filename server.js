@@ -34,7 +34,7 @@ app.use(
 app.use(morgan('combined'))
 
 app.get('/', (req, res) => {
-  res.send('Hello World! Miss Valentine')
+  res.send('Hello World! Miss Valentine server')
   res.end()
 })
 
