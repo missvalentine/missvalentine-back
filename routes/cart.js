@@ -1,28 +1,23 @@
 const express = require('express')
 const router = express.Router()
 
-const { isAuthenticate, isSignIn } = require('../controllers/authController')
+const { isAuth } = require('../controllers/authController')
 
 const {
-  createSubCategory,
-  getAllSubCategory,
-  updateSubCategory,
-  getSubCategoryById,
-  deleteSubCategory,
-  getOneSubcategoryId,
+  getMyCartByCartId,
+  addProductToCart,
+  removeProductFromCart,
+  clearCart,
 } = require('../controllers/cartController')
 const { getUserById } = require('../controllers/userController')
 
 router.param('userId', getUserById)
-router.param('cartId', getSubCategoryById)
+// router.param('cartId', getSubCategoryById)
 
 //Routes
-router.post('/create', isSignIn, isAuthenticate, createSubCategory)
-
-router.get('/:cartId', getOneSubcategoryId)
-
-router.put('/:cartId', isSignIn, isAuthenticate, updateSubCategory)
-
-router.delete('/:cartId', isSignIn, isAuthenticate, deleteSubCategory)
+router.get('/', isAuth, getMyCartByCartId)
+router.post('/add-product', isAuth, addProductToCart)
+router.delete('/remove-product', isAuth, removeProductFromCart)
+router.put('/clear-cart', isAuth, clearCart)
 
 module.exports = router

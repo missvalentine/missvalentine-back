@@ -1,83 +1,92 @@
 const Cart = require('../models/cart')
-// const Category = require('../models/category');
+const Product = require('../models/product')
 
-exports.populateCart = (req, res, next, id) => {
-  Cart.findById(id).exec((err, _cart) => {
-    if (err || !_cart) {
-      return res.json({
-        message: 'No Cart Found ',
-        success: false,
-      })
-    }
-    req.subcategory = _cart
-    next()
-  })
-}
-exports.getMyCartById = async (req, res, next) => {
+exports.getMyCartByCartId = async (req, res, next) => {
   try {
-    console.log(req)
-    return await SubCategory.findById(req.subcategory._id)
-      .populate('products')
-      .exec((err, sCate) => {
+    return await Cart.findById(req.profile.cart)
+      .populate('products.product')
+      .populate('products.product.category')
+      .exec((err, cart) => {
         if (err) {
           return res.json({
-            error: 'Not able to fetch subcategory',
+            error: 'Not able to fetch cart items.',
             success: false,
           })
         }
         return res.status(200).json({
           success: true,
-          data: sCate,
+          data: cart,
         })
       })
   } catch (error) {
+    console.error('[Get Cart] [Error] ', error)
     return res.status(500).json({
       success: false,
       error: 'Server Error',
     })
   }
 }
-exports.getAllSubCategory = (req, res) => {
-  SubCategory.find()
-    .populate('category')
-    .exec((err, subcategories) => {
-      if (err) {
-        return res.json({
-          error: 'Not able to fetch Categories',
-          success: false,
-        })
+exports.addProductToCart = async (req, res, next) => {
+  try {
+    const { productId, quantity } = req.body
+    let mycart = await Cart.findById(req.profile.cart)
+    const fetchedProduct = await Product.findById(productId)
+
+    if (mycart && fetchedProduct) {
+      //cart exists for user
+      const name = fetchedProduct.name
+      const price = fetchedProduct.price || 0
+      let itemIndex = mycart.products.findIndex((p) => p.product == productId)
+      if (itemIndex > -1) {
+        //product exists in the cart, update the quantity
+        let productItem = mycart.products[itemIndex]
+        productItem.quantity = quantity
+        mycart.products[itemIndex] = productItem
+      } else {
+        //product does not exists in cart, add new item
+        mycart.products.unshift({ product: productId, quantity, name, price })
       }
-      return res.json({ data: subcategories, success: true })
+      mycart = await mycart.save()
+
+      return res.status(200).json({
+        success: true,
+        cart: mycart,
+        message: `${name} added `,
+      })
+    } else {
+      //no cart for user, create new cart
+      return res.status(500).json({
+        success: false,
+        error: 'Something went Wrong! Please contact Customer Care',
+      })
+    }
+  } catch (error) {
+    console.log('[Add To cart] [Error]', error)
+    return res.status(500).json({
+      success: false,
+      error: 'Server Error',
     })
+  }
 }
 
-exports.createCart = (req, res) => {
-  const cart = new Cart(req.body);
+exports.clearCart = async (req, res) => {
   try {
-    Cart.updateOne(
-      { _id: req.body.category },
-      {
-        $push: {
-          subcategories: subcategory._id,
-        },
+    const mycart = await Cart.findByIdAndUpdate(req.profile.cart, {
+      $set: {
+        products: [],
       },
-    ).exec((err, cate) => {
-      console.log('hello', err, cate)
     })
-
-    Cart.save((err, cate) => {
-      if (err) {
-        return res.json({
-          message: 'Not able to Add SubCategory',
-          success: false,
-        })
-      }
-      return res.json({
-        data: cate,
+    if (mycart)
+      return res.status(200).json({
         success: true,
-        message: 'SubCategory Added Successfully',
+        data: mycart,
+        message: 'Cart Cleared SuccessFully',
       })
-    })
+    else
+      return res.status(402).json({
+        message: 'Cart cant be  wrong',
+        success: false,
+      })
   } catch {
     return res.status(500).json({
       message: 'Something went wrong',
@@ -86,71 +95,32 @@ exports.createCart = (req, res) => {
   }
 }
 
-exports.deleteSubCategory = (req, res) => {
-  const subcategory = req.subcategory
+exports.removeProductFromCart = (req, res) => {
   try {
-    subcategory.remove((err, deletedCategory) => {
-      if (err) {
-        return res.json({
-          message: 'Not able to Delete SubCategory',
-          success: false,
-        })
-      }
-      return res.json({
-        success: true,
-        message: 'SubCategory Deletion SuccessFull',
-      })
-    })
-  } catch {
-    return res.status(500).json({
-      message: 'Something went wrong',
-      success: false,
-    })
-  }
-}
+    console.log('productId', req.body.productId)
 
-exports.updateSubCategory = (req, res) => {
-  const subcategory = req.subcategory
-  subcategory.name = req.body.name
-  if (req.body.category !== subcategory.category) {
-    Category.updateOne(
-      { _id: req.body.category },
-      {
-        $push: {
-          subcategories: subcategory._id,
-        },
-      },
-    ).exec((err, cate) => {
-      console.log('adding sc to new c', err, cate)
-    })
-    Category.updateOne(
-      { _id: subcategory.category },
+    Cart.findByIdAndUpdate(
+      req.profile.cart,
       {
         $pull: {
-          subcategories: subcategory._id,
+          products: { product: req.body.productId },
         },
       },
-    ).exec((err, cate) => {
-      console.log('removing sc from prev c', err, cate)
-    })
-    subcategory.category = req.body.category
-  }
+      false,
+      (err, cart) => {
+        if (!err) {
+          return res.status(200).json({
+            success: true,
+            data: cart,
+            message: 'Item removed SuccessFully',
+          })
+        }
+      },
+    )
 
-  try {
-    subcategory.save((err, updatedSubCategory) => {
-      if (err) {
-        return res.json({
-          message: 'Category Modification failed',
-          success: false,
-        })
-      }
-      return res.json({
-        message: 'Category Updated Successfully',
-        success: true,
-        data: updatedSubCategory,
-      })
-    })
-  } catch {
+    // mycart = await mycart.save()
+  } catch (error) {
+    console.log('[Remove from cart] [Error]', error)
     return res.status(500).json({
       message: 'Something went wrong',
       success: false,

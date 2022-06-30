@@ -46,14 +46,23 @@ var userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    wishlist: {
-      ref: 'Wishlist',
-      type: ObjectId,
-    },
+    wishlist: [
+      {
+        ref: 'Product',
+        type: ObjectId,
+        unique: true,
+      },
+    ],
     cart: {
       ref: 'Cart',
       type: ObjectId,
     },
+    addresses: [
+      {
+        ref: 'Address',
+        type: ObjectId,
+      },
+    ],
     orders: {
       type: Array,
       default: [],

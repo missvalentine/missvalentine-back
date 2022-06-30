@@ -12,6 +12,7 @@ const contactRouter = require('./routes/contact')
 const productRouter = require('./routes/product')
 const categoryRouter = require('./routes/category')
 const subcategoryRouter = require('./routes/subcategory')
+const cartRouter = require('./routes/cart')
 const authRoutes = require('./routes/auth')
 const userRoutes = require('./routes/user')
 
@@ -45,6 +46,7 @@ app.use('/api/contact', contactRouter)
 app.use('/api/product', productRouter)
 app.use('/api/category', categoryRouter)
 app.use('/api/subcategory', subcategoryRouter)
+app.use('/api/cart', cartRouter)
 
 app.listen(port, () => {
   console.log(` App listening at ${port}`)
