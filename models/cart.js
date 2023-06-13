@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-const { ObjectId } = mongoose.Schema
 
 const CartItemSchema = new Schema({
   product: {
@@ -10,14 +9,25 @@ const CartItemSchema = new Schema({
   },
   quantity: {
     type: Number,
-    required: true,
+    required: [true, 'Quantity is required.'],
     min: [1, 'Quantity can not be less then 1.'],
   },
   price: {
     type: Number,
-    required: true,
+    required: [true, 'Price is required.'],
+  },
+  color: {
+    type: String,
+    required: [true, 'Color is required.'],
+  },
+  size: {
+    type: String,
+    required: [true, 'Size is required.'],
   },
 })
+
+CartItemSchema.index({ product: 1, color: 1, size: 1 }, { unique: true })
+
 module.exports = mongoose.model('CartItem', CartItemSchema)
 
 const CartSchema = new Schema(

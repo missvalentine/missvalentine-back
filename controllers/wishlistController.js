@@ -40,31 +40,33 @@ exports.getUserWishlist = async (req, res, next) => {
 exports.addProductToWishlist = async (req, res, next) => {
   try {
     const { productId } = req.body
-
-    User.updateOne(
-      { _id: req.profile._id },
+    return User.updateOne(
+      { _id: req.profile._id, wishlist: { $ne: productId } },
       {
-        $push: {
+        $addToSet: {
           wishlist: productId,
         },
       },
-    ).exec((err, wishlist) => {
-      if (err)
-        return res.status(402).json({
+    )
+      .then((user) => {
+        console.log('user', user)
+        return res.status(200).json({
+          success: true,
+          // wishlist: user,
+          message: `Item wishlisted `,
+        })
+      })
+      .catch((err) => {
+        return res.status(500).json({
           success: false,
           error: 'Something went Wrong! Please contact Customer Care',
         })
-      return res.status(200).json({
-        success: true,
-        cart: wishlist,
-        message: `Item wishlisted `,
       })
-    })
   } catch (error) {
     console.log('[Add To cart] [Error]', error)
     return res.status(500).json({
       success: false,
-      error: 'Server Error',
+      error: 'Something went Wrong! Please contact Customer Care',
     })
   }
 }
@@ -91,24 +93,28 @@ exports.clearWishlist = async (req, res) => {
   }
 }
 
-exports.removeProductFromCart = (req, res) => {
+exports.removeProductFromWishlist = (req, res) => {
   try {
-    console.log('productId', req.body.productId)
-
-    Cart.findByIdAndUpdate(
-      req.profile.cart,
+    const { productId } = req.body
+    User.findByIdAndUpdate(
+      req.profile._id,
       {
         $pull: {
-          products: { product: req.body.productId },
+          wishlist: productId,
         },
       },
       false,
-      (err, cart) => {
+      (err, wishlist) => {
         if (!err) {
           return res.status(200).json({
             success: true,
-            data: cart,
+            data: wishlist,
             message: 'Item removed SuccessFully',
+          })
+        } else {
+          return res.status(500).json({
+            message: 'Something went wrong',
+            success: false,
           })
         }
       },
@@ -116,7 +122,7 @@ exports.removeProductFromCart = (req, res) => {
 
     // mycart = await mycart.save()
   } catch (error) {
-    console.log('[Remove from cart] [Error]', error)
+    console.log('[Remove from wishlist] [Error]', error)
     return res.status(500).json({
       message: 'Something went wrong',
       success: false,

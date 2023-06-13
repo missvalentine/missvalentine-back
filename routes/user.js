@@ -25,6 +25,7 @@ const {
   getUserWishlist,
   clearWishlist,
   addProductToWishlist,
+  removeProductFromWishlist,
 } = require('../controllers/wishlistController')
 
 router.param('userId', getUserById)
@@ -44,6 +45,6 @@ router.delete('/delete-address', isAuth, deleteAddress)
 router.get('/get-wishlist', isAuth, getUserWishlist)
 router.put('/clear-wishlist', isAuth, clearWishlist)
 router.post('/add-item-to-wishist', isAuth, addProductToWishlist)
-// router.delete('/remove-product', isAuth, removeProductFromCart)
+router.delete('/remove-item-from-wishist', isAuth, removeProductFromWishlist)
 
 module.exports = router

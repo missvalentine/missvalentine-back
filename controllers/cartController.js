@@ -28,38 +28,48 @@ exports.getMyCartByCartId = async (req, res, next) => {
 }
 exports.addProductToCart = async (req, res, next) => {
   try {
-    const { productId, quantity } = req.body
-    let mycart = await Cart.findById(req.profile.cart)
+    //TODO Improve add logic
+    const { productId, quantity, color, size } = req.body
+    let mycart = await Cart.findOne({ _id: req.profile.cart })
     const fetchedProduct = await Product.findById(productId)
 
-    if (mycart && fetchedProduct) {
-      //cart exists for user
-      const name = fetchedProduct.name
-      const price = fetchedProduct.price || 0
-      let itemIndex = mycart.products.findIndex((p) => p.product == productId)
-      if (itemIndex > -1) {
-        //product exists in the cart, update the quantity
-        let productItem = mycart.products[itemIndex]
-        productItem.quantity = quantity
-        mycart.products[itemIndex] = productItem
-      } else {
-        //product does not exists in cart, add new item
-        mycart.products.unshift({ product: productId, quantity, name, price })
-      }
-      mycart = await mycart.save()
+    if (mycart)
+      if (mycart && fetchedProduct) {
+        //cart exists for user
+        const name = fetchedProduct.name
+        const price = fetchedProduct.price || 0
+        let itemIndex = mycart.products.findIndex(
+          (p) => p.product == productId && p.color === color && p.size === size,
+        )
+        if (itemIndex > -1) {
+          //product exists in the cart, update the quantity
+          let productItem = mycart.products[itemIndex]
+          productItem.quantity = quantity
+          mycart.products[itemIndex] = productItem
+        } else {
+          //product does not exists in cart, add new item
+          mycart.products.unshift({
+            product: productId,
+            quantity,
+            price,
+            size,
+            color,
+          })
+        }
+        mycart = await mycart.save()
 
-      return res.status(200).json({
-        success: true,
-        cart: mycart,
-        message: `${name} added `,
-      })
-    } else {
-      //no cart for user, create new cart
-      return res.status(500).json({
-        success: false,
-        error: 'Something went Wrong! Please contact Customer Care',
-      })
-    }
+        return res.status(200).json({
+          success: true,
+          cart: mycart,
+          message: `${name} added `,
+        })
+      } else {
+        //no cart for user, create new cart
+        return res.status(500).json({
+          success: false,
+          error: 'Something went Wrong! Please contact Customer Care',
+        })
+      }
   } catch (error) {
     console.log('[Add To cart] [Error]', error)
     return res.status(500).json({
@@ -98,12 +108,12 @@ exports.clearCart = async (req, res) => {
 exports.removeProductFromCart = (req, res) => {
   try {
     console.log('productId', req.body.productId)
-
-    Cart.findByIdAndUpdate(
-      req.profile.cart,
+    const { productId, size, color } = req.body
+    Cart.findOneAndUpdate(
+      { _id: req.profile.cart },
       {
         $pull: {
-          products: { product: req.body.productId },
+          products: { product: productId, size, color },
         },
       },
       false,
