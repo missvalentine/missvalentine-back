@@ -36,6 +36,10 @@ router.post(
 
 router.get('/signout', signout)
 
+router.get('/test', (req, res) => {
+  res.send('A test route')
+})
+
 router.get('/testroute', isSignIn, (req, res) => {
   res.send('A protected route')
 })
