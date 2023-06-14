@@ -26,11 +26,20 @@ connectDB()
 // app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json())
 app.use(cookieParser())
-app.use(cors())
+const corsOptions = {
+  origin: '*',
+  credentials: true, //access-control-allow-credentials:true
+  optionSuccessStatus: 200,
+}
+
+app.use(cors(corsOptions)) // Use this after the variable declaration
 app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Content-Type, Authorization, Accept, Origin',
+  )
   res.setHeader('Access-Control-Allow-Credentials', true)
   next()
 })
