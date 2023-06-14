@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "description": "backend for miss valentine",
   "main": "server.js",
+  "engines": {
+    "node": "18.x || 16.x"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "client-build": "cd client && npm run build",
     "client-install": "npm install --prefix client",
-    "start": "node server",
-    "dev": "nodemon server"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "author": "akshat aggarwal",
   "license": "ISC",
