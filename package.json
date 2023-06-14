@@ -1,6 +1,6 @@
 {
   "name": "missvalentine-backend",
-  "version": "1.0.0",
+  "version": "1.1.2",
   "description": "backend for miss valentine",
   "main": "server.js",
   "engines": {
@@ -24,12 +24,12 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "express-jwt": "^6.0.0",
+    "express-jwt": "^8.4.1",
     "express-validator": "^6.14.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^5.11.14",
     "morgan": "^1.10.0",
-    "multer": "^1.4.2",
+    "multer": "^2.0.0-rc.4",
     "nodemon": "^2.0.7",
     "path": "^0.12.7"
   },
